@@ -1,7 +1,6 @@
 package org.shangyang.red5.cluster;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.red5.client.net.rtmp.ClientExceptionHandler;
 import org.red5.client.net.rtmp.RTMPClient;
@@ -10,7 +9,6 @@ import org.red5.server.api.event.IEvent;
 import org.red5.server.api.event.IEventDispatcher;
 import org.red5.server.api.service.IPendingServiceCall;
 import org.red5.server.api.service.IPendingServiceCallback;
-import org.red5.server.messaging.IMessage;
 import org.red5.server.net.rtmp.Channel;
 import org.red5.server.net.rtmp.RTMPConnection;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
@@ -34,21 +32,29 @@ public class RelayPuller extends RTMPClient{
 
 	RelayPusher pusher;
 	
-	// 缓存需要 relay push 的数据，从 puller 中获取
-	ConcurrentLinkedQueue<IMessage> frameBuffer = new ConcurrentLinkedQueue<IMessage>();
-	
 	boolean is_pusher_initialized = false;
 	
-    private String server = "10.211.55.8"; // get the source packet from 
+    private String server; 
     
-    private int port = 1935;
+    private int port = 1935; // default.
 
-    private String appname = "my-first-red5-example"; //oflaDemo
+    private String appname;
 
-    private String streamname = "mystream"; //"Avengers2.mp4";
+    private String streamname;
     
     private final boolean live = true;
 
+    
+    public RelayPuller( String server, String appname, String streamname ){
+    	
+    	this.server = server;
+    	
+    	this.appname = appname;
+    	
+    	this.streamname = streamname;
+    	
+    }
+    
     public RelayPuller( String server, int port, String appname, String streamname ){
     	
     	this.server = server;
