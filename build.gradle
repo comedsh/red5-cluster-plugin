@@ -1,14 +1,12 @@
+// 执行 clean deploy 将自动将所需的 jar包 和 相关配置文件发布到 red5 server 中
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-sourceCompatibility = 1.5
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 version = '1.0'
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'Gradle Quickstart',
-                   'Implementation-Version': version
-    }
-}
 
 repositories {
     mavenCentral()
@@ -30,6 +28,49 @@ dependencies {
     
     compile group: 'org.red5', name: 'red5-service', version: '1.0.7-RELEASE'
     
+    compile group: 'redis.clients', name: 'jedis', version: '2.8.1'
+    
+    compile group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.7.4'
+    
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'red5-cluster-plugin',
+                   'Implementation-Version': version
+    }
+    
+    exclude 'org/shangyang/red5/red5-common.xml'
+}
+
+task exportRuntimeJars(type: Copy) {
+  from configurations.runtime
+  into 'build/libs' // 目标位置
+}
+
+task exportConf(type:Copy, overwrite:true){
+	from 'build/resources/main/org/shangyang/red5/red5-common.xml'
+	into '/Users/mac/programs/red5-server-1.0.7/conf'
+}
+
+task exportClient(type:Copy, overwrite:true){
+	from 'build/libs/red5-client-1.0.7-RELEASE.jar'
+	into '/Users/mac/programs/red5-server-1.0.7/lib'
+}
+
+task deploy(type:Copy, overwrite:true){
+	
+	dependsOn build
+	
+	dependsOn exportRuntimeJars
+	
+	dependsOn exportConf
+	
+	dependsOn exportClient
+	
+	from 'build/libs/red5-cluster-plugin-1.0.jar'
+	into '/Users/mac/programs/red5-server-1.0.7/plugins'	
+		
 }
 
 test {

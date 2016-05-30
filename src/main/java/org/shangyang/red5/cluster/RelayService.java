@@ -8,10 +8,18 @@ package org.shangyang.red5.cluster;
  *
  */
 public class RelayService {
-
-	// Q: 为什么不定义 pusher 作为成员变量？因为 puhser 直接被 puller 的回调方法所调用
 	
-	RelayPuller puller;
+	private static RelayService service;
+	
+	public static synchronized RelayService getInstance(){
+		
+		if( service == null ){
+			service = new RelayService();
+		}
+		
+		return service;
+		
+	}
 	
 	/**
 	 * 
@@ -20,9 +28,9 @@ public class RelayService {
 	 * @param appName
 	 * @param streamName
 	 */
-	public void initRelayPuller(String server, int port, String appname, String streamname){
+	public void startRelay(String server, int port, String appname, String streamname){
 		
-		puller = new RelayPuller( server, port, appname, streamname );
+		RelayPuller puller = new RelayPuller( server, port, appname, streamname );
 		
 		puller.startRelay();
 		

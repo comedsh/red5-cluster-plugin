@@ -25,7 +25,7 @@ import org.red5.server.stream.message.RTMPMessage;
  * 
  * 只支持 live 的 relay..
  * 
- * @author shangyang
+ * @author 商洋
  *
  */
 public class RelayPuller extends RTMPClient{
@@ -122,19 +122,20 @@ public class RelayPuller extends RTMPClient{
         	
         	IRTMPEvent event = (IRTMPEvent) e;
         	
-        	final byte headerDataType = event.getHeader().getDataType();
+        	// final byte headerDataType = event.getHeader().getDataType();
         	
         	// FIXME: uses log4j instead
             System.out.println(" ============================================ ClientStream.dispachEvent()" + event.toString());
             
-            if( headerDataType == Constants.TYPE_VIDEO_DATA || headerDataType == Constants.TYPE_AUDIO_DATA ){
+            // not sure, perhaps we don't need the following checks, because some metadata also need to be send. 
+            // if( headerDataType == Constants.TYPE_VIDEO_DATA || headerDataType == Constants.TYPE_AUDIO_DATA ){
 
                 RTMPMessage message = RTMPMessage.build( event );
                 
                 // most important, push this message to the native server.. 
                 pusher.pushMessage( message );
 
-            }
+            // }
             
             
         }
