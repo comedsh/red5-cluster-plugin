@@ -44,22 +44,24 @@ public class RelayProviderService extends ProviderService{
 			 *  1. if the live stream existed, protected the live stream has been pull twice. -> need the event to remove from nodeCache
 			 *  2. if the live stream not existed, protected the scheduler been created twice. -> need the event to remove from nodeCache
 			 */
-			
+			// handler the pull scenario.
 			if( nodeCache.add(new Node( scope.getName(), name ) ) == true ){
-
-				RelayRegisterService service = RelayRegisterService.getInstance();
 				
-				ScopePoint sp = service.find( scope.getName(), name );
+				RelayService.getInstance().startRelay( "10.211.55.8", 1935, "my-first-red5-example", "mystream" );
 				
-				if( sp == null ){
-					
-					// TODO implement the scheduler job to pull the stream periodically.
-					
-				}else{
-				
-					RelayService.getInstance().startRelay( sp.getServer(), sp.getPort(), sp.getScope(), sp.getStreamName() );
-					
-				}
+//				RelayRegisterService service = RelayRegisterService.getInstance();
+//				
+//				ScopePoint sp = service.find( scope.getName(), name );
+//				
+//				if( sp == null ){
+//					
+//					// TODO implement the scheduler job to pull the stream periodically. and how to destroy the scheduler
+//					
+//				}else{
+//				
+//					RelayService.getInstance().startRelay( sp.getServer(), sp.getPort(), sp.getScope(), sp.getStreamName() );
+//					
+//				}
 			}
 			
 			// FIXME: if the live stoped, should remove the key group [appname, streamname] out from cache. 
@@ -71,6 +73,9 @@ public class RelayProviderService extends ProviderService{
 	}
 	
 }
+
+
+
 
 /**
  * 

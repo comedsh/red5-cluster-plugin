@@ -1,6 +1,7 @@
 package org.shangyang.red5.cluster;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.red5.client.net.rtmp.ClientExceptionHandler;
 import org.red5.client.net.rtmp.RTMPClient;
@@ -14,7 +15,6 @@ import org.red5.server.net.rtmp.RTMPConnection;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
 import org.red5.server.net.rtmp.event.Notify;
 import org.red5.server.net.rtmp.event.Ping;
-import org.red5.server.net.rtmp.message.Constants;
 import org.red5.server.net.rtmp.message.Header;
 import org.red5.server.net.rtmp.status.StatusCodes;
 import org.red5.server.stream.message.RTMPMessage;
@@ -125,7 +125,7 @@ public class RelayPuller extends RTMPClient{
         	// final byte headerDataType = event.getHeader().getDataType();
         	
         	// FIXME: uses log4j instead
-            System.out.println(" ============================================ ClientStream.dispachEvent()" + event.toString());
+            System.out.println(" ============================================ ClientStream.dispachEvent()" + event.toString() );
             
             // not sure, perhaps we don't need the following checks, because some metadata also need to be send. 
             // if( headerDataType == Constants.TYPE_VIDEO_DATA || headerDataType == Constants.TYPE_AUDIO_DATA ){
@@ -137,7 +137,21 @@ public class RelayPuller extends RTMPClient{
 
             // }
             
-            
+            /*
+             * 问题描述，
+             * 	  1. 因为 pusher.pushMessage 是通过 Mina 发送，而 mina 是异步的，就是说，是新开启的一个线程在处理
+             *    2. 而，diapachEvent 是在 BaseRTMPHanlder#messageRecieved() 方法中调用的，而，这个方法的最后一步，要执行 message.release()，要把流数据清空。
+             *    
+             *    正是因为 #1 和 #2 是异步执行的，所以可能会导致在 #1 最终发送数据之前，而数据被#2清空了
+             */
+            // 用摄像头作为源，播放直播的时候，relay message 有可能因为现成的原因丢失掉.. 设置一个时间点，让 message 能够被顺利的 push 出去
+            // 下面只是一个临时的解决方案，完整的解决方案，必须是，clone, 可以试试 BeanUtils.    
+            try {
+				TimeUnit.MILLISECONDS.sleep(100);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         }
         
     };

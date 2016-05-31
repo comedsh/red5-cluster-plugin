@@ -95,14 +95,21 @@
     </bean>
     
     <!-- High level access to streams -->
+     
     <bean id="streamService" class="org.red5.server.stream.StreamService"/>
     
-    <!-- High level access to broadcasted streams -->
     <!-- 
-    <bean id="providerService" class="org.red5.server.stream.ProviderService"/>
+    <bean id="streamService" class="org.shangyang.red5.cluster.RelayStreamService"/>
      -->
+    <!-- High level access to broadcasted streams -->
+	
+	<!--      
+    <bean id="providerService" class="org.red5.server.stream.ProviderService"/>
+    -->
+     
     <bean id="providerService" class="org.shangyang.red5.cluster.RelayProviderService"/> 
     
+     
     <!-- Provides output to consumers -->
     <bean id="consumerService" class="org.red5.server.stream.ConsumerService"/>
  

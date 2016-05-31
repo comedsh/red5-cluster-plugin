@@ -1,0 +1,1 @@
+执行 gradle --rerun-tasks deploy 构建测试环境

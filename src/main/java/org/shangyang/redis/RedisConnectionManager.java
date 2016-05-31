@@ -34,7 +34,7 @@ public class RedisConnectionManager {
 
 	protected Set<String> cluster;
 
-	String host = "10.211.55.8"; // FIXME: for test
+	String host = "10.211.55.8"; // FIXME: hard set just for test
 
 	int port = redis.clients.jedis.Protocol.DEFAULT_PORT;
 
@@ -44,13 +44,18 @@ public class RedisConnectionManager {
 	
 	static RedisConnectionManager redisConectionManager;
 	
+	/**
+	 * FIXME: should get performance tuning, using container to initialize it at the init step of the container.
+	 * 
+	 * @return
+	 */
 	public static synchronized RedisConnectionManager getInstance(){
 		
 		if( redisConectionManager == null ){
 			
 			redisConectionManager = new RedisConnectionManager();
 			
-			redisConectionManager.initializeDatabaseConnection();
+			redisConectionManager.initializeRedisConnection();
 			
 		}
 		
@@ -64,7 +69,7 @@ public class RedisConnectionManager {
 
 			if (isRedisInitialized == false) {
 
-				initializeDatabaseConnection();
+				initializeRedisConnection();
 
 				isRedisInitialized = true;
 
@@ -93,7 +98,7 @@ public class RedisConnectionManager {
 		throw new JedisRuntimeException("no expected connection retrived");
 	}
 
-	void initializeDatabaseConnection() throws JedisRuntimeException {
+	void initializeRedisConnection() throws JedisRuntimeException {
 
 		try {
 
@@ -104,8 +109,7 @@ public class RedisConnectionManager {
 
 				if (sentinelSet != null && sentinelSet.size() > 0) {
 
-					connectionPool = new JedisSentinelPool(getSentinelMaster(), sentinelSet, this.connectionPoolConfig,
-							redis.clients.jedis.Protocol.DEFAULT_TIMEOUT, getPassword());
+					connectionPool = new JedisSentinelPool(getSentinelMaster(), sentinelSet, this.connectionPoolConfig, redis.clients.jedis.Protocol.DEFAULT_TIMEOUT, getPassword());
 
 				} else {
 

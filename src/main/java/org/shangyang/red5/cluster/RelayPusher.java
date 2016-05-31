@@ -144,13 +144,13 @@ public class RelayPusher extends RTMPClient implements INetStreamEventHandler, I
 	
 	public void onStreamEvent( Notify notify ) {   
 			
-		logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ready, pulish the stream data from frameBuffer ");
+		System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ready, pulish the stream data from frameBuffer ");
 		
 	    ObjectMap<?, ?> map = (ObjectMap<?, ?>) notify.getCall().getArguments()[0];
 	    
 	    String code = (String) map.get("code");
 	    
-	    logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  the code is  " + code );
+	    System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  the code is  " + code );
 	    
 	    if (StatusCodes.NS_PUBLISH_START.equals(code)) {
 	    	
@@ -173,7 +173,7 @@ public class RelayPusher extends RTMPClient implements INetStreamEventHandler, I
 			
 			channel.write(  ( ( RTMPMessage ) message ).getBody() );
 			
-			logger.debug(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  write the message to server successfull <<<<<<<<<<<<<<<<<<<<<<<< ");
+			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  write the message to server successfull <<<<<<<<<<<<<<<<<<<<<<<< ");
 			
 		}else{
 			

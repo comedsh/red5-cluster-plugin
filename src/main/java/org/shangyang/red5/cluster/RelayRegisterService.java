@@ -57,7 +57,7 @@ public class RelayRegisterService {
 	 * @param streamName 
 	 * @throws JsonProcessingException 
 	 */
-	public void saveLiveInfo(String address, int port, String scope, String streamName) throws RelayException{
+	public boolean save(String address, int port, String scope, String streamName) throws RelayException{
 		
 		String key = this.generateUniqueCode(scope, streamName);
 		
@@ -70,7 +70,11 @@ public class RelayRegisterService {
 			
 			jedisAdapter.set( key, serial );			
 			
+			return true;
+			
 		}
+		
+		return false;
 		
 	}
 
@@ -90,10 +94,7 @@ public class RelayRegisterService {
 	    
 		String serial = null;
 		
-		try{
-
-			  
-			
+		try{			
 			serial = mapper.writeValueAsString(sp);
 			
 		}catch( JsonProcessingException e){

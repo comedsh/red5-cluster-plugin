@@ -53,8 +53,18 @@ task exportConf(type:Copy, overwrite:true){
 	into '/Users/mac/programs/red5-server-1.0.7/conf'
 }
 
-task exportClient(type:Copy, overwrite:true){
+task exportClientJars(type:Copy, overwrite:true){
 	from 'build/libs/red5-client-1.0.7-RELEASE.jar'
+	from 'build/libs/jedis-2.8.1.jar'
+	from 'build/libs/commons-pool2-2.4.2.jar'
+	from 'build/libs/jackson-annotations-2.7.0.jar'
+	from 'build/libs/jackson-core-2.7.4.jar'
+	from 'build/libs/jackson-databind-2.7.4.jar'
+	from 'build/libs/jackson-jaxrs-base-2.7.4.jar'
+	from 'build/libs/jackson-jaxrs-json-provider-2.7.4.jar'
+	from 'build/libs/jackson-module-jaxb-annotations-2.7.4.jar'
+	from 'build/libs/jackson-module-jaxb-annotations-2.7.4.jar'
+	
 	into '/Users/mac/programs/red5-server-1.0.7/lib'
 }
 
@@ -65,8 +75,8 @@ task deploy(type:Copy, overwrite:true){
 	dependsOn exportRuntimeJars
 	
 	dependsOn exportConf
-	
-	dependsOn exportClient
+
+	dependsOn exportClientJars	
 	
 	from 'build/libs/red5-cluster-plugin-1.0.jar'
 	into '/Users/mac/programs/red5-server-1.0.7/plugins'	

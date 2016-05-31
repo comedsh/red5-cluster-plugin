@@ -16,7 +16,11 @@ public class ScopePoint {
 	String scope;
 	
 	String streamName;
-
+	
+	public ScopePoint(){
+		
+	}
+	
 	public ScopePoint(String server, int port, String scope, String streamName){
 		
 		this.server = server;
