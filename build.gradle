@@ -68,15 +68,7 @@ task exportClientJars(type:Copy, overwrite:true){
 	into '/Users/mac/programs/red5-server-1.0.7/lib'
 }
 
-task deploy(type:Copy, overwrite:true){
-	
-	dependsOn build
-	
-	dependsOn exportRuntimeJars
-	
-	dependsOn exportConf
-
-	dependsOn exportClientJars	
+task deploy(dependsOn: [build, exportRuntimeJars, exportConf, exportClientJars], type:Copy, overwrite:true){
 	
 	from 'build/libs/red5-cluster-plugin-1.0.jar'
 	into '/Users/mac/programs/red5-server-1.0.7/plugins'	
