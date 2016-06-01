@@ -13,7 +13,6 @@ import org.red5.server.messaging.IMessage;
 import org.red5.server.net.rtmp.RTMPConnection;
 import org.red5.server.net.rtmp.event.Notify;
 import org.red5.server.net.rtmp.status.StatusCodes;
-import org.red5.server.stream.message.RTMPMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -160,18 +159,34 @@ public class RelayPusher extends RTMPClient implements INetStreamEventHandler, I
 		    
 	}  
 	
-	// Must wait ready for push before push the message
-	// really start push the message to the server.
+	/**
+	 * Must wait ready for push before push the message
+	 * Really start push the message to the server.
+	 * 
+	 *    问题描述，
+     * 	  1. 因为 pusher.pushMessage 是通过 Mina 发送，而 mina 是异步的，就是说，是新开启的一个线程在处理
+     *    2. 而，diapachEvent 是在 BaseRTMPHanlder#messageRecieved() 方法中调用的，而，这个方法的最后一步，要执行 message.release()，要把流数据清空。
+     *    
+     *    正是因为 #1 和 #2 是异步执行的，所以可能会导致在 #1 最终发送数据之前，而数据被#2清空了
+     *    
+     *    Uses this.publishStreamData(streamId, message); can resolve the issue above because it duplicate the IoBuffer.
+
+	 * @param message
+	 */
 	public void pushMessage( IMessage message ){
 	
 		if( readyForPush ){
 			// getChannelForStreamId(streamId) 这个方法比较有趣，原本以为，程序里面会保存一个 Map 之类的对象，以用来记录 stream id 和 channel id 之间的对应关系
-			// 殊不知，作者是写了一个固定的算法，一个唯一的 stream id 只会导出一个唯一的 channel id 
-			int channelId = super.getChannelForStreamId( streamId );
+			// 殊不知，作者是写了一个固定的算法，一个唯一的 stream id 只会导出一个唯一的 channel id
+			// 我怎么会调用下面这三个方法呢？至今仍是个迷, 如果使用下面的方法会导致上述的并发问题，message missing in accident. 
 			
-			org.red5.server.net.rtmp.Channel channel = super.getConnection().getChannel(channelId);
-			
-			channel.write(  ( ( RTMPMessage ) message ).getBody() );
+//			int channelId = super.getChannelForStreamId( streamId );
+//			
+//			org.red5.server.net.rtmp.Channel channel = super.getConnection().getChannel(channelId);
+//			
+//			channel.write(  ( ( RTMPMessage ) message ).getBody() );
+
+			this.publishStreamData(streamId, message);
 			
 			System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  write the message to server successfull <<<<<<<<<<<<<<<<<<<<<<<< ");
 			

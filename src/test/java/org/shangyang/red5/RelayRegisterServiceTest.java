@@ -3,6 +3,7 @@ package org.shangyang.red5;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.shangyang.red5.cluster.RelayException;
 import org.shangyang.red5.cluster.RelayRegisterService;
@@ -54,6 +55,7 @@ public class RelayRegisterServiceTest {
 	}
 	
 	@Test
+	@Ignore // mark this test case will not auto execute when gradle build during :test step. 
 	public void testSerialize() throws RelayException{
 		
 		JedisAdapter jedisAdapter = RedisConnectionManager.getInstance().getConenction();

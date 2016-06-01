@@ -1,7 +1,7 @@
 package org.shangyang.red5.cluster;
 
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.red5.client.net.rtmp.ClientExceptionHandler;
 import org.red5.client.net.rtmp.RTMPClient;
@@ -10,6 +10,8 @@ import org.red5.server.api.event.IEvent;
 import org.red5.server.api.event.IEventDispatcher;
 import org.red5.server.api.service.IPendingServiceCall;
 import org.red5.server.api.service.IPendingServiceCallback;
+import org.red5.server.messaging.IConsumer;
+import org.red5.server.messaging.InMemoryPushPushPipe;
 import org.red5.server.net.rtmp.Channel;
 import org.red5.server.net.rtmp.RTMPConnection;
 import org.red5.server.net.rtmp.event.IRTMPEvent;
@@ -44,6 +46,9 @@ public class RelayPuller extends RTMPClient{
     
     private final boolean live = true;
 
+    volatile List<IConsumer> consumers; // direct relay the stream to the client
+    
+    transient InMemoryPushPushPipe pipe; // the pipe with a bundle of @see ConnectionConsumer, which maintained the connection with the client which wants to pull the stream.
     
     public RelayPuller( String server, String appname, String streamname ){
     	
@@ -64,6 +69,18 @@ public class RelayPuller extends RTMPClient{
     	this.port = port;
     	
     	this.streamname = streamname;
+    	
+    }
+    
+    public void setConnectionConsumers( List<IConsumer> consumers ){
+    	
+    	this.consumers = consumers; // keep the reference there
+    	
+    }
+    
+    public void setPushPushPipe( InMemoryPushPushPipe pipe ){
+    	
+    	this.pipe = pipe; // keep the reference
     	
     }
     
@@ -114,7 +131,6 @@ public class RelayPuller extends RTMPClient{
     /**
      * 当客户端成功获取流数据后，会回调这个方法，获取服务器上的流数据 (RTMPEvent)，然后定义这个方法的目的是用来如何处理这些数据。
      * 
-     * 
      */
     private IEventDispatcher streamEventDispatcher = new IEventDispatcher() {
     	
@@ -137,21 +153,35 @@ public class RelayPuller extends RTMPClient{
 
             // }
             
+            
+            
+           
+            
             /*
-             * 问题描述，
-             * 	  1. 因为 pusher.pushMessage 是通过 Mina 发送，而 mina 是异步的，就是说，是新开启的一个线程在处理
-             *    2. 而，diapachEvent 是在 BaseRTMPHanlder#messageRecieved() 方法中调用的，而，这个方法的最后一步，要执行 message.release()，要把流数据清空。
-             *    
-             *    正是因为 #1 和 #2 是异步执行的，所以可能会导致在 #1 最终发送数据之前，而数据被#2清空了
+             * direct send the message to the live wait consumers. 
+             *  
+             * duplicate the method from InMemoryPushPushPipe#pushMessage()
+             * 
+             * TODO below code marked as v2.0 to be implemented
+             * 
              */
-            // 用摄像头作为源，播放直播的时候，relay message 有可能因为现成的原因丢失掉.. 设置一个时间点，让 message 能够被顺利的 push 出去
-            // 下面只是一个临时的解决方案，完整的解决方案，必须是，clone, 可以试试 BeanUtils.    
-            try {
-				TimeUnit.MILLISECONDS.sleep(100);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+            
+//            for (IConsumer consumer : consumers) { // attention, consumer is PlayEngine, not ConnectionConsumer.. PlayEngine implemented the IConsumer
+//            	
+//                try {
+//                	
+//                    IPushableConsumer pcon = (IPushableConsumer) consumer;
+//                    
+//                    pcon.pushMessage(null, message); // set null as the pipe... because pipe never used in this method.
+//                        
+//                    
+//                } catch (Throwable t) {
+//                	
+//                	t.printStackTrace();	
+//                }
+//
+//            }
+            
         }
         
     };
